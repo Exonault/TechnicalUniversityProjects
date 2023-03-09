@@ -1,0 +1,14 @@
+[
+  {
+    "Width": 111,
+    "Height": 222,
+    "Area": 24642.0,
+    "Location": {
+      "X": 239,
+      "Y": 178
+    },
+    "ColorBorder": "64, 126, 252",
+    "FillColor": "100, 64, 126, 252",
+    "IsSelected": false
+  }
+]
