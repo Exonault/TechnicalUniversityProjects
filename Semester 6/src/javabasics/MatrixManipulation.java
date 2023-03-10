@@ -1,3 +1,5 @@
+package javabasics;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,30 +10,32 @@ public class MatrixManipulation {
     private final static Scanner input = new Scanner(System.in);
 
     public void executeProgram() {
-        writeToFile(new int[1][1], 1);
 
-//        int[][] matrix = createMatrix();
-//        int size = matrix.length; // square matrix
-//        printMatrix(matrix, size);
-//
-//        int sumAllElements = sumAllElements(matrix, size);
-//        System.out.printf("Sum of all elements: %d \n", sumAllElements);
-//
-//        int[] sumOfAllRows = sumOfAllRows(matrix, size);
-//        printArray(sumOfAllRows);
-//
-//        int[] sumOfAllColumns = sumOfAllColumns(matrix, size);
-//        printArray(sumOfAllColumns);
-//
-//        int sumOfAllColumnsMin = getMin(sumOfAllColumns);
-//        int sumOfAllColumnsMax = getMax(sumOfAllColumns);
-//        int sumOfAllRowsMin = getMin(sumOfAllRows);
-//        int sumOfAllRowsMax = getMax(sumOfAllRows);
-//
-//        System.out.printf("Min of all columns: %d \n", sumOfAllColumnsMin);
-//        System.out.printf("Max of all columns: %d \n", sumOfAllColumnsMax);
-//        System.out.printf("Min of all rows: %d \n", sumOfAllRowsMin);
-//        System.out.printf("Max of all rows: %d \n", sumOfAllRowsMax);
+
+        int[][] matrix = createMatrix();
+        int size = matrix.length; // square matrix
+        printMatrix(matrix, size);
+
+        int sumAllElements = sumAllElements(matrix, size);
+        System.out.printf("Sum of all elements: %d \n", sumAllElements);
+
+        int[] sumOfAllRows = sumOfAllRows(matrix, size);
+        printArray(sumOfAllRows);
+
+        int[] sumOfAllColumns = sumOfAllColumns(matrix, size);
+        printArray(sumOfAllColumns);
+
+        int sumOfAllColumnsMin = getMin(sumOfAllColumns);
+        int sumOfAllColumnsMax = getMax(sumOfAllColumns);
+        int sumOfAllRowsMin = getMin(sumOfAllRows);
+        int sumOfAllRowsMax = getMax(sumOfAllRows);
+
+        System.out.printf("Min of all columns: %d \n", sumOfAllColumnsMin);
+        System.out.printf("Max of all columns: %d \n", sumOfAllColumnsMax);
+        System.out.printf("Min of all rows: %d \n", sumOfAllRowsMin);
+        System.out.printf("Max of all rows: %d \n", sumOfAllRowsMax);
+
+        writeToFile(matrix, size);
 
     }
 
@@ -45,7 +49,7 @@ public class MatrixManipulation {
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                System.out.printf("Enter element for [%d,%d] \n", i, j);
+                System.out.printf("Enter a number for [%d,%d] \n", i, j);
                 int value = input.nextInt();
                 matrix[i][j] = value;
             }
@@ -97,24 +101,35 @@ public class MatrixManipulation {
     }
 
     private int getMin(int[] array) {
-        return Arrays.stream(array).min().getAsInt();
+        if (array.length == 0) {
+            return 0;
+        } else return Arrays.stream(array).min().getAsInt();
     }
 
     private int getMax(int[] array) {
-        return Arrays.stream(array).max().getAsInt();
+        if (array.length == 0) {
+            return 0;
+        } else return Arrays.stream(array).max().getAsInt();
     }
 
     private void writeToFile(int[][] matrix, int size) {
         try {
-            File myObj = new File("filename.txt");
-            if (myObj.createNewFile()) {
-                System.out.println("File created: " + myObj.getName());
-            } else {
-                System.out.println("File already exists.");
+            File file = new File("filename.txt");
+            if (!file.exists()) {
+                file.createNewFile();
+                //System.out.println("File created: " + myObj.getName());
+
             }
 
-            FileWriter fw = new FileWriter(myObj);
-            fw.write("asdfg");
+            FileWriter fw = new FileWriter(file);
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    int value = matrix[i][j];
+                    fw.write(value + "\t");
+
+                }
+                fw.write("\n");
+            }
             fw.close();
 
         } catch (IOException e) {
