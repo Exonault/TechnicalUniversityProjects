@@ -1,8 +1,8 @@
-import iohomework.homeworkfour.IOHomework4;
+import iohomework.homeworkfive.IOHomework5;
 
 public class StartUp {
     public static void main(String[] args) {
-        new IOHomework4().calculateMinimum(1, 1, 1);
+        new IOHomework5().calculateMinimum(1, 1);
 
     }
 }
