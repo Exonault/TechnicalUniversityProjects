@@ -65,7 +65,7 @@ public class GameButton extends JButton {
                 return "<html><font size = '16'><b>*</b></font></html>";
             } else {
                 if (getBombCount() > 0) {
-                    return getBombCount() + "";
+                    return String.valueOf(getBombCount());
                 } else return "";
             }
         }
@@ -89,7 +89,7 @@ public class GameButton extends JButton {
                 return color;
             }
             if (getBombCount() == 2 || getBombCount() == 6) {
-                Color color = new Color(0,51,0);
+                Color color = new Color(0, 51, 0);
                 return color;
             }
             if (getBombCount() == 3 || getBombCount() == 7) {

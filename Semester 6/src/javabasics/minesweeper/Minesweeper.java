@@ -10,25 +10,25 @@ import java.util.Random;
 public class Minesweeper extends JPanel implements AWTEventListener, ActionListener {
 
     public static boolean isColorCheatOn = false;
-    private int max_bombs;
-    private int rows;
-    private int cols;
+    private final int maxBombs;
+    private final int rows;
+    private final int cols;
 
-    private JLabel timerLabel = new JLabel("0");
-    private JButton resetButton = new JButton("Reset");
+    private final JLabel timerLabel = new JLabel("0");
+    private final JButton resetButton = new JButton("Reset");
     private GameState state = GameState.NotStarted;
-    private int total;
-    private JPanel mainPanel;
-    private JLabel bombCountLabel;
+    private final int total;
+    private final JPanel mainPanel;
+    private final JLabel bombCountLabel;
 
     public Minesweeper(int rows, int cols, int maxBombs) {
         this.rows = rows;
         this.cols = cols;
-        this.max_bombs = maxBombs;
+        this.maxBombs = maxBombs;
 
         total = rows * cols;
         mainPanel = new JPanel(new GridLayout(rows, cols));
-        bombCountLabel = new JLabel(max_bombs + "");
+        bombCountLabel = new JLabel(String.valueOf(this.maxBombs));
 
         setLayout(new BorderLayout());
         add(mainPanel, BorderLayout.CENTER);
@@ -43,7 +43,7 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
             @Override
             public void run() {
                 while (state == GameState.Playing) {
-                    timerLabel.setText((Long.parseLong(timerLabel.getText()) + 1) + "");
+                    timerLabel.setText(String.valueOf(Long.parseLong(timerLabel.getText()) + 1));
                     timerLabel.updateUI();
                     try {
                         Thread.sleep(1000);
@@ -57,25 +57,17 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
         thread.start();
     }
 
-    private void showAbout() {
-        JOptionPane.showMessageDialog
-                (this,
-                        "<html>Brigitte: Rally to me! </html>",
-                        "About",
-                        JOptionPane.INFORMATION_MESSAGE);
-    }
-
     private void restartGame() {//Restarts the game
         state = GameState.NotStarted;
         timerLabel.setText("0");
         mainPanel.removeAll();
         createButtons();
         mainPanel.updateUI();
-        bombCountLabel.setText("" + max_bombs);
+        bombCountLabel.setText(String.valueOf(maxBombs));
         bombCountLabel.updateUI();
     }
 
-    private void addControlPanel() {//Generates the menu in the game(bombCounter, timer and restart button)
+    private void addControlPanel() {
         JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         timerPanel.add(timerLabel);
 
@@ -98,7 +90,7 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                JButton btn = getButton(lstBombLocation, total, new Point(row, col) {
+                JButton btn = getButton(lstBombLocation, new Point(row, col) {
                     @Override
                     public String toString() {
                         return (int) getX() + ", " + (int) getY();
@@ -113,7 +105,7 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
             }
         }
 
-        while (lstBombLocation.size() < max_bombs) {
+        while (lstBombLocation.size() < maxBombs) {
             updateBombs(lstBombLocation, mainPanel.getComponents());
         }
         for (Component c : mainPanel.getComponents()) {
@@ -137,11 +129,11 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
         }
     }
 
-    private GameButton getButton(List<Point> lstBombsLocation, int totalLocations, Point location) {//generates the buttons
+    private GameButton getButton(List<Point> lstBombsLocation, Point location) {//generates the buttons
         GameButton btn = new GameButton(location);
         btn.setMargin(new Insets(0, 0, 0, 0));
         btn.setFocusable(false);
-        if (lstBombsLocation.size() < max_bombs) {
+        if (lstBombsLocation.size() < maxBombs) {
             if (isBomb()) {
                 btn.setBomb(true);
                 lstBombsLocation.add(location);
@@ -154,13 +146,13 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
                     state = GameState.Playing;
                     startThread();
                 }
-                if (((GameButton) mouseEvent.getSource()).isEnabled() == false) {
+                if (!((GameButton) mouseEvent.getSource()).isEnabled()) {
                     return;
                 }
                 if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
                     if (((GameButton) mouseEvent.getSource()).getState() == State.Marked) {
                         ((GameButton) mouseEvent.getSource()).setState(State.Initial);
-                        bombCountLabel.setText((Long.parseLong(bombCountLabel.getText()) + 1) + "");
+                        bombCountLabel.setText(String.valueOf(Long.parseLong(bombCountLabel.getText()) + 1));
                         ((GameButton) mouseEvent.getSource()).updateUI();
                         return;
                     }
@@ -179,10 +171,10 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
                 } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
                     if (((GameButton) mouseEvent.getSource()).getState() == State.Marked) {
                         ((GameButton) mouseEvent.getSource()).setState(State.Initial);
-                        bombCountLabel.setText((Long.parseLong(bombCountLabel.getText()) + 1) + "");
+                        bombCountLabel.setText(String.valueOf(Long.parseLong(bombCountLabel.getText()) + 1));
                     } else {
                         ((GameButton) mouseEvent.getSource()).setState(State.Marked);
-                        bombCountLabel.setText((Long.parseLong(bombCountLabel.getText()) - 1) + "");
+                        bombCountLabel.setText(String.valueOf(Long.parseLong(bombCountLabel.getText()) - 1));
                     }
                 }
                 ((GameButton) mouseEvent.getSource()).updateUI();
@@ -226,7 +218,7 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
                     && b.getBombCount() == 0
                     && b.getState() != State.Clicked
                     && b.getState() != State.Marked
-                    && b.isBomb() == false) {
+                    && !b.isBomb()) {
                 b.setState(State.Clicked);
                 updateSurroundingZeros(b.getPosition());
                 b.updateUI();
@@ -236,7 +228,7 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
                     && b.getBombCount() > 0
                     && b.getState() != State.Clicked
                     && b.getState() != State.Marked
-                    && b.isBomb() == false) {
+                    && !b.isBomb()) {
                 b.setEnabled(false);
                 b.setState(State.Clicked);
                 b.updateUI();
@@ -257,13 +249,13 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
                 blastCount++;
             }
 
-            if (((GameButton) c).isBomb() == false
+            if (!((GameButton) c).isBomb()
                     && ((GameButton) c).getState() == State.Marked) {
                 ((GameButton) c).setState(State.WrongMarked);
             }
         }
 
-        bombCountLabel.setText("" + blastCount);
+        bombCountLabel.setText(String.valueOf(blastCount));
         bombCountLabel.updateUI();
 
         state = GameState.Finished;
@@ -301,7 +293,7 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
             }
         }
 
-        btn.setText(btn.getBombCount() + "");
+        btn.setText(String.valueOf(btn.getBombCount()));
     }
 
     private GameButton getButtonAt(Component[] components, Point position) {//Get buttons at a given place
@@ -314,14 +306,11 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
     }
 
     public void eventDispatched(AWTEvent event) {
-        if (KeyEvent.class.isInstance(event) && ((KeyEvent) (event)).getID() == KeyEvent.KEY_RELEASED) {//The separete keys
+        if (event instanceof KeyEvent && ((KeyEvent) (event)).getID() == KeyEvent.KEY_RELEASED) {//The separete keys
             if (((KeyEvent) (event)).getKeyCode() == KeyEvent.VK_F1) {
-                showAbout();
-            }
-            if (((KeyEvent) (event)).getKeyCode() == KeyEvent.VK_F2) {
                 restartGame();
             }
-            if (((KeyEvent) (event)).getKeyCode() == KeyEvent.VK_F3) {
+            if (((KeyEvent) (event)).getKeyCode() == KeyEvent.VK_F2) {
                 isColorCheatOn = !isColorCheatOn;
                 if (state == GameState.Playing) {
                     mainPanel.updateUI();
@@ -331,7 +320,7 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
             if (((KeyEvent) (event)).getKeyCode() == KeyEvent.VK_F12) {
                 for (Component c : mainPanel.getComponents()) {
                     GameButton b = (GameButton) c;
-                    if (b.isBomb() == false) {
+                    if (!b.isBomb()) {
                         b.setState(State.Clicked);
                     } else {
                         b.setState(State.Marked);
@@ -349,11 +338,11 @@ public class Minesweeper extends JPanel implements AWTEventListener, ActionListe
         }
     }
 
-    public static enum State {
+    public enum State {
         Clicked, Marked, Initial, WrongMarked
     }
 
-    public static enum GameState {
+    public enum GameState {
         NotStarted, Playing, Finished
     }
 
