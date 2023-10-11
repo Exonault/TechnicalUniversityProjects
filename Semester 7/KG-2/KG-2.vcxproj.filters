@@ -15,11 +15,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\Downloads\OGL2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="..\KG-excercises\KG-2-final.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\KG-excercises\KG-2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

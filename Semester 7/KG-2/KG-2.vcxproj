@@ -128,10 +128,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\Downloads\OGL2.cpp" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="..\KG-excercises\KG-2-final.cpp" />
+    <ClCompile Include="..\KG-excercises\KG-2.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\Downloads\SDL_OGL1.cpp" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="..\KG-excercises\KG-1.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
