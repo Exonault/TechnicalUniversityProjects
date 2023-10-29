@@ -32,6 +32,8 @@ SDL_GLContext gContext;
 GLuint gVAO, gVBO;
 Shader shader;
 GLuint textureId;
+GLuint textureId2;
+GLuint textureId3;
 //GLint alphaLocation;
 
 void HandleKeyUp(const SDL_KeyboardEvent& key);
@@ -177,7 +179,7 @@ bool LoadTexture(const char* filename, GLuint& texID)
 	}
 	else
 	{
-		printf("Failed to load texture\n");
+		printf("Failed to load texture %s \n", filename);
 		return false;
 	}
 	stbi_image_free(img_data);
@@ -198,19 +200,28 @@ bool initGL()
 		success = false;
 		printf("Error initializing OpenGL! %s\n", gluErrorString(error));
 	}
+
+	LoadTexture("./Textures/wall.jpg", textureId);
+
+	LoadTexture("./Textures/concrete.jpg", textureId2);
+
+	LoadTexture("./Textures/OpenGL_logo.png", textureId3);
+
 	glClearColor(0, 1, 0, 1);
 	//gShaderProgID = CreateShaderProg();
 	shader.Load("./Shaders/vertex.vert", "./Shaders/fragment.frag");
 	shader.use();
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);
+
 	shader.setInt("diffuse", 0);
+	shader.setInt("diffuse2", 1);
+	shader.setInt("alphaMask", 2);
 
 	gVAO = CreateCube(1.0f, gVBO);
 
-	if (!LoadTexture("./Textures/wall.jpg", textureId)) {
-		printf("Unable to load textures. \n");
-	}
+
 
 	//alphaLocation = glGetUniformLocation(gShaderProgID, "alpha");
 
@@ -292,7 +303,6 @@ GLuint CreateCube(float width, GLuint& VBO)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-
 	// note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -318,6 +328,12 @@ void DrawCube(GLuint vaoID)
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textureId2);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, textureId3);
 
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
