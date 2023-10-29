@@ -14,25 +14,22 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Shaders">
-      <UniqueIdentifier>{6b6af634-669f-4eb3-ba7e-e5aecbb3a6e5}</UniqueIdentifier>
+      <UniqueIdentifier>{0c5ccd35-b14f-4da1-bae1-66dff380db5a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CG-3.cpp">
+    <ClCompile Include="CG-4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\fragment.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\vertex.vert">
+      <Filter>Shaders</Filter>
+    </None>
     <None Include="packages.config" />
-    <None Include="shaders\fragment.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\vertex.vert">
-      <Filter>Shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="StartFile.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -41,5 +38,8 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="StartFile.txt" />
   </ItemGroup>
 </Project>

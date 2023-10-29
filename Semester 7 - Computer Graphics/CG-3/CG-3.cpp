@@ -1,4 +1,4 @@
-// KG-1.cpp : Defines the entry point for the console application.
+// KG-3.cpp : Defines the entry point for the console application.
 //
 
 //#define GLEW_STATIC
@@ -8,6 +8,10 @@
 #include <SDL_opengl.h>
 #include <stdio.h>
 #include <gl\GLU.h>
+#include "Shader.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 bool init();
 bool initGL();
@@ -16,6 +20,7 @@ GLuint CreateCube(float, GLuint&);
 GLuint CreateShaderProg();
 void DrawCube(GLuint id);
 void close();
+bool LoadTexture(const char*, GLuint&);
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -23,8 +28,11 @@ SDL_Window* gWindow = NULL;
 //OpenGL context
 SDL_GLContext gContext;
 
-GLuint gShaderProgID;
+//GLuint gShaderProgID;
 GLuint gVAO, gVBO;
+Shader shader;
+GLuint textureId;
+//GLint alphaLocation;
 
 void HandleKeyUp(const SDL_KeyboardEvent& key);
 
@@ -137,6 +145,46 @@ bool init()
 	return success;
 }
 
+bool LoadTexture(const char* filename, GLuint& texID)
+{
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //these are the default values for warping
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// read the texture
+	GLint width, height, channels;
+	stbi_set_flip_vertically_on_load(true); //flip the image vertically while loading
+	unsigned char* img_data = stbi_load(filename, &width, &height, &channels, 0); //read the image data
+
+	if (img_data)
+	{   //3 channels - rgb, 4 channels - RGBA
+		GLenum format;
+		switch (channels)
+		{
+		case 4:
+			format = GL_RGBA;
+			break;
+		default:
+			format = GL_RGB;
+			break;
+		}
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, img_data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		printf("Failed to load texture\n");
+		return false;
+	}
+	stbi_image_free(img_data);
+
+	return true;
+}
+
 bool initGL()
 {
 	bool success = true;
@@ -150,23 +198,43 @@ bool initGL()
 		success = false;
 		printf("Error initializing OpenGL! %s\n", gluErrorString(error));
 	}
+	glClearColor(0, 1, 0, 1);
+	//gShaderProgID = CreateShaderProg();
+	shader.Load("./Shaders/vertex.vert", "./Shaders/fragment.frag");
+	shader.use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	shader.setInt("diffuse", 0);
 
-	gShaderProgID = CreateShaderProg();
 	gVAO = CreateCube(1.0f, gVBO);
+
+	if (!LoadTexture("./Textures/wall.jpg", textureId)) {
+		printf("Unable to load textures. \n");
+	}
+
+	//alphaLocation = glGetUniformLocation(gShaderProgID, "alpha");
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	return success;
 }
 
+
+
 void close()
 {
 	//delete GL programs, buffers and objects
-	glDeleteProgram(gShaderProgID);
+	glDeleteProgram(shader.ID);
 	glDeleteVertexArrays(1, &gVAO);
 	glDeleteBuffers(1, &gVBO);
 
 	//Delete OGL context
 	SDL_GL_DeleteContext(gContext);
-	//Destroy window	
+	//Destroy window
 	SDL_DestroyWindow(gWindow);
 	gWindow = NULL;
 
@@ -182,75 +250,48 @@ void render()
 	DrawCube(gVAO);
 }
 
-GLuint CreateShaderProg()
-{
-	const GLchar* vertexShaderSource = "#version 330 core\n"
-		"layout(location = 0) in vec3 aPos;\n"
-		"void main()\n"
-		"{ gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);	}\n";
-
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	GLint  success;
-	GLchar infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success); //stores GL_TRUE or GL_FALSE in success
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED: %s\n", infoLog);
-	}
-
-	const GLchar* fragmentShaderSource = "#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"void main()\n"
-		"{ FragColor = vec4(0.0f, 0.5f, 1.0f, 1.0f); }\n";
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED: %s\n", infoLog);
-	}
-
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		printf("ERROR::SHADER::PROGRAM::LINK_FAILED: %s\n", infoLog);
-	}
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	return shaderProgram;
-}
-
 GLuint CreateCube(float width, GLuint& VBO)
 {
 	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f,  0.5f, 0.0f
+		//coordinates      //color			 //tex cord
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0, 1.0f,
+	};
+
+	GLuint indices[] = {
+		0, 1, 2,
+		0, 2, 3
 	};
 
 	GLuint VAO;
+	GLuint EBO;
+
 	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &VAO);
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); 
-	//the data comes from the currently bound GL_ARRAY_BUFFER
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+
+	//coordinates attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	//color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	//texture attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
 
 	// note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -259,14 +300,29 @@ GLuint CreateCube(float width, GLuint& VBO)
 	// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
 	glBindVertexArray(0);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 	return VAO;
 }
 
 void DrawCube(GLuint vaoID)
 {
-	glUseProgram(gShaderProgID);
+	shader.use();
 	glBindVertexArray(vaoID);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	GLuint time = SDL_GetTicks();
+	GLfloat alpha = (sin(time / 1000.0f) + 1) * 0.5f;
+	//float alpha = 1.0f;
+	//glUniform1f(alphaLocation, alpha);
+	shader.setFloat("alpha", alpha);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 	glBindVertexArray(0);
 }
 
