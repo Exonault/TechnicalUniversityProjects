@@ -1,4 +1,4 @@
-// KG-4.cpp : Defines the entry point for the console application.
+// KG-5.cpp : Defines the entry point for the console application.
 //
 
 //#define GLEW_STATIC
@@ -8,8 +8,9 @@
 #include <SDL_opengl.h>
 #include <stdio.h>
 #include <gl\GLU.h>
-#include "Shader.h"
+#include <glm/glm.hpp>
 
+#include "Shader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -35,6 +36,9 @@ GLuint textureId;
 GLuint textureId2;
 GLuint textureId3;
 //GLint alphaLocation;
+
+glm::vec3 translation = glm::vec3(0.0f);
+
 
 void HandleKeyUp(const SDL_KeyboardEvent& key);
 
@@ -87,7 +91,24 @@ int main(int argc, char* args[])
 
 void HandleKeyUp(const SDL_KeyboardEvent& key)
 {
+	switch (key.keysym.sym)
+	{
+	case SDLK_LEFT:
+		translation.x -= 0.5f;
+		break;
 
+	case SDLK_RIGHT:
+		translation.x += 0.5f;
+		break;
+
+	case SDLK_UP:
+		translation.y += 0.5f;
+		break;
+
+	case SDLK_DOWN:
+		translation.y -= 0.5f;
+		break;
+	}
 }
 
 bool init()
@@ -258,6 +279,22 @@ void render()
 	//Clear color buffer
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glm::mat4 projection = glm::perspective(glm::radians(45.0), 4.0 / 3.0, 0.1, 100.0);
+
+	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 7), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+
+	glm::mat4 model = glm::mat4(1.0f);
+
+	model = glm::translate(model, translation);
+	//model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+
+	shader.use();
+
+	shader.setMat4("projection", projection);
+	shader.setMat4("view", view);
+	shader.setMat4("model", model);
+
 	DrawCube(gVAO);
 }
 
@@ -317,7 +354,6 @@ GLuint CreateCube(float width, GLuint& VBO)
 
 void DrawCube(GLuint vaoID)
 {
-	shader.use();
 	glBindVertexArray(vaoID);
 
 	GLuint time = SDL_GetTicks();

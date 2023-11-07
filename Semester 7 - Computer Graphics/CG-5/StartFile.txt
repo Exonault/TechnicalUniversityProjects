@@ -1,4 +1,4 @@
-// KG-4.cpp : Defines the entry point for the console application.
+// KG-5.cpp : Defines the entry point for the console application.
 //
 
 //#define GLEW_STATIC
