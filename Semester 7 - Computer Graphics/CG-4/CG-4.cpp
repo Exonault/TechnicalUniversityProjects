@@ -29,8 +29,8 @@ SDL_Window* gWindow = NULL;
 SDL_GLContext gContext;
 
 //GLuint gShaderProgID;
-GLuint gVAO, gVBO;
-Shader shader;
+GLuint gVAOCube, gVBO;
+Shader shaderTexture;
 GLuint textureId;
 GLuint textureId2;
 GLuint textureId3;
@@ -209,17 +209,17 @@ bool initGL()
 
 	glClearColor(0, 1, 0, 1);
 	//gShaderProgID = CreateShaderProg();
-	shader.Load("./Shaders/vertex.vert", "./Shaders/fragment.frag");
-	shader.use();
+	shaderTexture.Load("./Shaders/vertex.vert", "./Shaders/fragment.frag");
+	shaderTexture.use();
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 
-	shader.setInt("diffuse", 0);
-	shader.setInt("diffuse2", 1);
-	shader.setInt("alphaMask", 2);
+	shaderTexture.setInt("diffuse", 0);
+	shaderTexture.setInt("diffuse2", 1);
+	shaderTexture.setInt("alphaMask", 2);
 
-	gVAO = CreateCube(1.0f, gVBO);
+	gVAOCube = CreateCube(1.0f, gVBO);
 
 
 
@@ -239,8 +239,8 @@ bool initGL()
 void close()
 {
 	//delete GL programs, buffers and objects
-	glDeleteProgram(shader.ID);
-	glDeleteVertexArrays(1, &gVAO);
+	glDeleteProgram(shaderTexture.ID);
+	glDeleteVertexArrays(1, &gVAOCube);
 	glDeleteBuffers(1, &gVBO);
 
 	//Delete OGL context
@@ -258,7 +258,7 @@ void render()
 	//Clear color buffer
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	DrawCube(gVAO);
+	DrawCube(gVAOCube);
 }
 
 GLuint CreateCube(float width, GLuint& VBO)
@@ -317,14 +317,14 @@ GLuint CreateCube(float width, GLuint& VBO)
 
 void DrawCube(GLuint vaoID)
 {
-	shader.use();
+	shaderTexture.use();
 	glBindVertexArray(vaoID);
 
 	GLuint time = SDL_GetTicks();
 	GLfloat alpha = (sin(time / 1000.0f) + 1) * 0.5f;
 	//float alpha = 1.0f;
 	//glUniform1f(alphaLocation, alpha);
-	shader.setFloat("alpha", alpha);
+	shaderTexture.setFloat("alpha", alpha);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);

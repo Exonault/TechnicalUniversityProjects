@@ -17,11 +17,15 @@
 bool init();
 bool initGL();
 void render();
-GLuint CreateCube(float, GLuint&);
+GLuint CreateCube(GLuint&);
 GLuint CreateShaderProg();
 void DrawCube(GLuint id);
 void close();
 bool LoadTexture(const char*, GLuint&);
+GLuint CreatePyramid();
+void DrawPyramid(GLuint);
+
+void HandleKeyUp(const SDL_KeyboardEvent& key);
 
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
@@ -30,17 +34,16 @@ SDL_Window* gWindow = NULL;
 SDL_GLContext gContext;
 
 //GLuint gShaderProgID;
-GLuint gVAOCube, gVBO;
-Shader shaderTexture;
+GLuint gVAOCube, gVBO, gVAOPyramid;
+Shader shaderTexture, shaderSolid;
 GLuint textureId;
 GLuint textureId2;
 GLuint textureId3;
 //GLint alphaLocation;
 
+float deltaTime;
+
 glm::vec3 translation = glm::vec3(0.0f);
-
-
-void HandleKeyUp(const SDL_KeyboardEvent& key);
 
 
 int main(int argc, char* args[])
@@ -50,8 +53,16 @@ int main(int argc, char* args[])
 	SDL_Event e;
 	//While application is running
 	bool quit = false;
+	GLuint currentFrame = SDL_GetTicks();
+	GLuint lastFrame = currentFrame;
 	while (!quit)
 	{
+		currentFrame = SDL_GetTicks();
+		deltaTime = currentFrame - lastFrame;
+		deltaTime /= 1000.0f;
+
+		lastFrame = currentFrame;
+
 		//Handle events on queue
 		while (SDL_PollEvent(&e) != 0)
 		{
@@ -231,7 +242,8 @@ bool initGL()
 	glClearColor(0, 1, 0, 1);
 	//gShaderProgID = CreateShaderProg();
 	shaderTexture.Load("./Shaders/vertex.vert", "./Shaders/fragment.frag");
-	shaderTexture.use();
+
+	shaderSolid.Load("./Shaders/vertex.vert", "./Shaders/solid.frag");
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);
@@ -240,7 +252,8 @@ bool initGL()
 	shaderTexture.setInt("diffuse2", 1);
 	shaderTexture.setInt("alphaMask", 2);
 
-	gVAOCube = CreateCube(1.0f, gVBO);
+	gVAOCube = CreateCube(gVBO);
+	gVAOPyramid = CreatePyramid();
 
 
 
@@ -249,8 +262,11 @@ bool initGL()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 
 	return success;
 }
@@ -277,11 +293,11 @@ void close()
 void render()
 {
 	//Clear color buffer
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 projection = glm::perspective(glm::radians(45.0), 4.0 / 3.0, 0.1, 100.0);
 
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 7), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	glm::mat4 view = glm::lookAt(glm::vec3(0, 3, 10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	glm::mat4 model = glm::mat4(1.0f);
 
@@ -296,9 +312,68 @@ void render()
 	shaderTexture.setMat4("model", model);
 
 	DrawCube(gVAOCube);
+
+	glm::mat4 cubeModel = model;
+
+	shaderSolid.use();
+
+	shaderSolid.setMat4("projection", projection);
+	shaderSolid.setMat4("view", view);
+
+	static float angle = 0.0f;
+	angle += 90.0f * deltaTime;
+	
+	model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	model = glm::translate(model, glm::vec3(0.0f, 1.2f, 0.0f));
+
+	shaderSolid.setMat4("model", model);
+	
+	DrawPyramid(gVAOPyramid);
+
+	static float angle2 = 0.0f;
+	angle2 += 180.0f * deltaTime;
+
+	model = glm::rotate(cubeModel, glm::radians(angle2),
+		glm::vec3(0.0f, 1.0f, 0.0f));
+
+	model = glm::translate(model, glm::vec3(4.0f, 0.0f, 0.0f));
+
+	shaderSolid.setMat4("model", model);
+
+	DrawPyramid(gVAOPyramid);
+	
+	glm::mat4 pyramidModel = model;
+
+	static float angle3 = 0.0f;
+	angle3 = 90.0f * deltaTime;
+
+	model = glm::rotate(pyramidModel, glm::radians(angle2),
+		glm::vec3(1.0f, 0.0f, 0.0f));
+
+	model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+
+	model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+
+	shaderSolid.setMat4("model", model);
+
+	DrawCube(gVAOCube);
+
+	shaderTexture.use();
+
+	model = glm::rotate(pyramidModel, glm::radians(angle2), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
+
+	model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+
+	shaderTexture.setMat4("model", model);
+
+	DrawCube(gVAOCube);
+
 }
 
-GLuint CreateCube(float width, GLuint& VBO)
+GLuint CreateCube(GLuint& VBO)
 {
 	float vertices[] = {
 		//coordinates      //color			 //tex cord
@@ -378,4 +453,56 @@ void DrawCube(GLuint vaoID)
 	glBindVertexArray(0);
 }
 
+GLuint CreatePyramid()
+{
+	float vertices[] = {
+		-0.5f, -0.5f, 0.5f,
+		0.5f, -0.5f, 0.5f,
+		0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		0.0f, 0.5f, 0.0f
+	};
 
+	int indices[] = {
+		0, 1 ,4,
+		1, 2, 4,
+		2, 3, 4,
+		3, 0, 4
+	};
+
+	GLuint VBO;
+	GLuint VAO;
+	GLuint EBO;
+
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+	glGenVertexArrays(1, &VAO);
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	glBindVertexArray(0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	
+	return VAO;
+}
+
+void DrawPyramid(GLuint vaoID)
+{
+	glBindVertexArray(vaoID);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
+	glBindVertexArray(0);
+}

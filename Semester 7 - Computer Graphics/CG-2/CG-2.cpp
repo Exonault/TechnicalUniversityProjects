@@ -24,7 +24,7 @@ SDL_Window* gWindow = NULL;
 SDL_GLContext gContext;
 
 GLuint gShaderProgID;
-GLuint gVAO, gVBO;
+GLuint gVAOCube, gVBO;
 GLint alphaLocation;
 
 void HandleKeyUp(const SDL_KeyboardEvent& key);
@@ -153,7 +153,7 @@ bool initGL()
 	}
 	glClearColor(0, 1, 0, 1);
 	gShaderProgID = CreateShaderProg();
-	gVAO = CreateCube(1.0f, gVBO);
+	gVAOCube = CreateCube(1.0f, gVBO);
 
 	alphaLocation = glGetUniformLocation(gShaderProgID, "alpha");
 
@@ -167,7 +167,7 @@ void close()
 {
 	//delete GL programs, buffers and objects
 	glDeleteProgram(gShaderProgID);
-	glDeleteVertexArrays(1, &gVAO);
+	glDeleteVertexArrays(1, &gVAOCube);
 	glDeleteBuffers(1, &gVBO);
 
 	//Delete OGL context
@@ -185,7 +185,7 @@ void render()
 	//Clear color buffer
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	DrawCube(gVAO);
+	DrawCube(gVAOCube);
 }
 
 GLuint CreateShaderProg()

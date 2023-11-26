@@ -30,8 +30,8 @@ SDL_Window* gWindow = NULL;
 SDL_GLContext gContext;
 
 //GLuint gShaderProgID;
-GLuint gVAOCube, gVBO;
-Shader shaderTexture;
+GLuint gVAO, gVBO;
+Shader shader;
 GLuint textureId;
 GLuint textureId2;
 GLuint textureId3;
@@ -230,17 +230,17 @@ bool initGL()
 
 	glClearColor(0, 1, 0, 1);
 	//gShaderProgID = CreateShaderProg();
-	shaderTexture.Load("./Shaders/vertex.vert", "./Shaders/fragment.frag");
-	shaderTexture.use();
+	shader.Load("./Shaders/vertex.vert", "./Shaders/fragment.frag");
+	shader.use();
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 
-	shaderTexture.setInt("diffuse", 0);
-	shaderTexture.setInt("diffuse2", 1);
-	shaderTexture.setInt("alphaMask", 2);
+	shader.setInt("diffuse", 0);
+	shader.setInt("diffuse2", 1);
+	shader.setInt("alphaMask", 2);
 
-	gVAOCube = CreateCube(1.0f, gVBO);
+	gVAO = CreateCube(1.0f, gVBO);
 
 
 
@@ -260,8 +260,8 @@ bool initGL()
 void close()
 {
 	//delete GL programs, buffers and objects
-	glDeleteProgram(shaderTexture.ID);
-	glDeleteVertexArrays(1, &gVAOCube);
+	glDeleteProgram(shader.ID);
+	glDeleteVertexArrays(1, &gVAO);
 	glDeleteBuffers(1, &gVBO);
 
 	//Delete OGL context
@@ -289,13 +289,13 @@ void render()
 	//model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	//model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
 
-	shaderTexture.use();
+	shader.use();
 
-	shaderTexture.setMat4("projection", projection);
-	shaderTexture.setMat4("view", view);
-	shaderTexture.setMat4("model", model);
+	shader.setMat4("projection", projection);
+	shader.setMat4("view", view);
+	shader.setMat4("model", model);
 
-	DrawCube(gVAOCube);
+	DrawCube(gVAO);
 }
 
 GLuint CreateCube(float width, GLuint& VBO)
@@ -360,7 +360,7 @@ void DrawCube(GLuint vaoID)
 	GLfloat alpha = (sin(time / 1000.0f) + 1) * 0.5f;
 	//float alpha = 1.0f;
 	//glUniform1f(alphaLocation, alpha);
-	shaderTexture.setFloat("alpha", alpha);
+	shader.setFloat("alpha", alpha);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureId);
