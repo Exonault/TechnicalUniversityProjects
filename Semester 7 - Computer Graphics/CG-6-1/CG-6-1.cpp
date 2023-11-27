@@ -369,7 +369,7 @@ void render()
 
 	shaderTexture.setMat4("model", model);
 
-	DrawCube(gVAOCube);
+	DrawCube(gVAOCube); 
 
 }
 
