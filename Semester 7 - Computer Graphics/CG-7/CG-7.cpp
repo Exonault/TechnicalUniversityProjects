@@ -35,7 +35,7 @@ Shader gLightShader;
 GLuint gVAO, gVBO;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 4.0f));
 float lastX = -1;
 float lastY = -1;
 bool firstMouse = true;
@@ -269,6 +269,12 @@ void render()
 	//and it is a mat3, as normals are only directions, so they should not be affected by translation
 	glm::mat3 normalMat = glm::transpose(glm::inverse(model));
 
+	static float angle = 0.0f;
+	angle += 90.0f * deltaTime;
+
+	//lightPos.x = cos(glm::radians(angle)) * 1.5f;
+	//lightPos.z = sin(glm::radians(angle)) * 1.5f;
+
 	glUseProgram(gCubeShader.ID);
 	//transformations
 	gCubeShader.setMat4("model", model);
@@ -279,15 +285,19 @@ void render()
 	gCubeShader.setVec3("viewPos", camera.Position);
 
 	//lighting
-	gCubeShader.setVec3("light1.diffuse", 1.0f, 1.0f, 1.0f);
+	//gCubeShader.setVec3("light1.diffuse", 1.0f, 1.0f, 1.0f);
+	gCubeShader.setVec3("light1.diffuse", 0,0,0);
 	gCubeShader.setVec3("light1.position", lightPos);
 	
 
 	//material properties
 	gCubeShader.setVec3("material1.ambient", 0.2125f, 0.1275f, 0.054f);
 	gCubeShader.setVec3("material1.diffuse", 0.714f, 0.4284f, 0.18144f);
+	//gCubeShader.setVec3("material1.diffuse", 0,0,0);
 	gCubeShader.setVec3("material1.specular", 0.393548f, 0.271906f, 0.166721f);
+	//gCubeShader.setVec3("material1.specular", 0,0,0);
 	gCubeShader.setFloat("material1.shininess", 0.2f * 128);
+	//gCubeShader.setFloat("material1.shininess", 0);
 	//material coefficients
 	gCubeShader.setFloat("material1.ka", 0.1f);
 	gCubeShader.setFloat("material1.kd", 1.0f);
@@ -295,14 +305,14 @@ void render()
 
 
 	//material properties
-	gCubeShader.setVec3("material2.ambient", 0.2125f, 0.1275f, 0.054f);
-	gCubeShader.setVec3("material2.diffuse", 0.714f, 0.4284f, 0.18144f);
-	gCubeShader.setVec3("material2.specular", 0.393548f, 0.271906f, 0.166721f);
-	gCubeShader.setFloat("material2.shininess", 0.2f * 128);
-	//material coefficients
-	gCubeShader.setFloat("material2.ka", 0.1f);
-	gCubeShader.setFloat("material2.kd", 1.0f);
-	gCubeShader.setFloat("material2.ks", 1.0f);
+	//gCubeShader.setVec3("material2.ambient", 0.2125f, 0.1275f, 0.054f);
+	//gCubeShader.setVec3("material2.diffuse", 0.714f, 0.4284f, 0.18144f);
+	//gCubeShader.setVec3("material2.specular", 0.393548f, 0.271906f, 0.166721f);
+	//gCubeShader.setFloat("material2.shininess", 0.2f * 128);
+	////material coefficients
+	//gCubeShader.setFloat("material2.ka", 0.1f);
+	//gCubeShader.setFloat("material2.kd", 1.0f);
+	//gCubeShader.setFloat("material2.ks", 1.0f);
 
 	gCubeShader.setVec3("light2.diffuse", 1.0f, 1.0f, 1.0f);
 	gCubeShader.setVec3("light2.position", lightPos2);
@@ -314,6 +324,7 @@ void render()
 	gLightShader.setMat4("view", view);
 	model = glm::mat4(1);
 	model = glm::translate(model, lightPos);
+	//glm::vec3 lightPos(1.2f, 0.5f, 2.0f);
 	model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
 	gLightShader.setMat4("model", model);
 

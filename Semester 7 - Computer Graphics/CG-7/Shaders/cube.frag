@@ -24,7 +24,6 @@ uniform vec3 viewPos;
 uniform Material material1;
 uniform Light light1;
 
-uniform Material material2;
 uniform Light light2;
 
 vec3 getColor(Material, Light);
@@ -46,9 +45,9 @@ void main()
    vec3 diffuse1 = getDiffuse(material1, light1);
    vec3 specular1 = getSpecular(material1, light1);
 
-   vec3 ambient2 = getAmbient(material2);
-   vec3 diffuse2 = getDiffuse(material2, light2);
-   vec3 specular2 = getSpecular(material2, light2);
+   vec3 ambient2 = getAmbient(material1);
+   vec3 diffuse2 = getDiffuse(material1, light2);
+   vec3 specular2 = getSpecular(material1, light2);
 
    vec3 result = ambient1 + diffuse1 + specular1 + ambient2 + diffuse2 + specular2;
    FragColor = vec4(result, 1.0);
@@ -109,6 +108,5 @@ vec3 getSpecular(Material material, Light light)
 	//cos to the power of shininess of angle between light reflected ray and view direction
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); 
     vec3 specular = material.ks * (spec * material.specular);  
-
     return specular;
 }
