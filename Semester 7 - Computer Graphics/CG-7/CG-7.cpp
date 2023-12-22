@@ -285,8 +285,8 @@ void render()
 	gCubeShader.setVec3("viewPos", camera.Position);
 
 	//lighting
-	//gCubeShader.setVec3("light1.diffuse", 1.0f, 1.0f, 1.0f);
-	gCubeShader.setVec3("light1.diffuse", 0,0,0);
+	gCubeShader.setVec3("light1.diffuse", 1.0f, 1.0f, 1.0f);
+	//gCubeShader.setVec3("light1.diffuse", 0,0,0);
 	gCubeShader.setVec3("light1.position", lightPos);
 	
 
