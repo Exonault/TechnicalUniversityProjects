@@ -1,6 +1,6 @@
 ﻿namespace CourseWork.Data;
 
-public class DataEntry
+public class Request
 {
     public int RequestId { get; set; }
 

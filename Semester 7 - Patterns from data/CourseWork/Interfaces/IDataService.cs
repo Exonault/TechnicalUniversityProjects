@@ -28,12 +28,12 @@ public interface IDataService
 
    public RefinancedReportResponse Refinanced();
 
-   public Task<List<ProductByRequestStatusMonthCountReportResponse>> ProductByRequestStatusCountMonth();
+   public Task<List<ProductByRequestStatusYearMonthCountReportResponse>> ProductByRequestStatusCountYearMonth();
    
    public Task<List<ProductByRequestStatusYearCountReportResponse>> ProductByRequestStatusCountYear();
-   
-   
-   
+
+   public Task<List<ProductAddressRegionCountReportResponse>> ProductAddressRegionCountReport();
+
 
 
 

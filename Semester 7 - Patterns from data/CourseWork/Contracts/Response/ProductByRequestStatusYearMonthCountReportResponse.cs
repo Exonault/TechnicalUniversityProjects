@@ -1,10 +1,12 @@
 ﻿namespace CourseWork.Contracts.Response;
 
-public class ProductByRequestStatusMonthCountReportResponse
+public class ProductByRequestStatusYearMonthCountReportResponse
 {
     public string Product { get; set; }
 
     public string RequestStatus { get; set; }
+
+    public int Year { get; set; }
 
     public int Month { get; set; }
 

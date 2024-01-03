@@ -1,65 +1,73 @@
-select ds."RequestStatus" , count(ds."RequestStatus")
-from "DataSet" ds 
+select r."RequestStatus" , count(r."RequestStatus")
+from "Requests" r 
 group by "RequestStatus" 
 
-select ds."Product", count(ds."Product")
-from "DataSet" ds 
+select r."RequestStatus",
+avg(r."ApprovedAmount") as "ApprovedAmount", 
+avg(r."LendedAmount") as "LendedAmount",
+avg(r."RepaidAmount") as "RepaidAmount"
+from "Requests" r 
+group by "RequestStatus" 
+
+select r."Product", count(r."Product")
+from "Requests" r 
 group by "Product" 
 
-select ds."AddressRegion", count(ds."AddressRegion")
-from "DataSet" ds 
+select r."Product",
+avg(r."ApprovedAmount") as "ApprovedAmount", 
+avg(r."LendedAmount") as "LendedAmount",
+avg(r."RepaidAmount") as "RepaidAmount"
+from "Requests" r 
+group by "Product" 
+
+select r."Product", r."AddressRegion", count(r."RequestId")
+from "Requests" r 
+group by r."Product", r."AddressRegion" 
+order by r."Product", r."AddressRegion" 
+
+select r."Product" , 
+date_part('year', r."ApplicationDate") as "year",
+r."RequestStatus" as "requestStatus",
+count(date_part('year', r."ApplicationDate")) as "count"
+from "Requests" r 
+group by r."Product","year", "requestStatus"
+order by r."Product","year", "requestStatus"
+
+select r."Product" , 
+date_part('year', r."ApplicationDate") as "year",
+date_part('month', r."ApplicationDate") as "month",
+r."RequestStatus" as "requestStatus",
+count(date_part('year', r."ApplicationDate")) as "count"
+from "Requests" r 
+group by r."Product","requestStatus", "year", "month"
+order by r."Product","requestStatus", "year", "month"
+
+
+select r."AddressRegion", count(r."AddressRegion")
+from "Requests" r 
 group by "AddressRegion" 
 
-select ds."Product",
-avg(ds."ApprovedAmount") as "ApprovedAmount", 
-avg(ds."LendedAmount") as "LendedAmount",
-avg(ds."RepaidAmount") as "RepaidAmount"
-from "DataSet" ds 
-group by "Product" 
+select avg(r."ApprovedAmount") as "ApprovedAmount" 
+from "Requests" r 
 
-select ds."RequestStatus",
-avg(ds."ApprovedAmount") as "ApprovedAmount", 
-avg(ds."LendedAmount") as "LendedAmount",
-avg(ds."RepaidAmount") as "RepaidAmount"
-from "DataSet" ds 
-group by "RequestStatus" 
+select avg(r."LendedAmount") as "LendedAmount" 
+from "Requests" r 
 
-select avg(ds."ApprovedAmount") as "ApprovedAmount" 
-from "DataSet" ds 
+select avg(r."RepaidAmount") as "RepaidAmount" 
+from "Requests" r 
 
-select avg(ds."LendedAmount") as "LendedAmount" 
-from "DataSet" ds 
+select count(CASE WHEN r."IsNewClient" THEN 1 END) as "newClientCount", count(r."RequestId")
+from "Requests" r 
 
-select avg(ds."RepaidAmount") as "RepaidAmount" 
-from "DataSet" ds 
+select count(CASE WHEN r."IsPaidOff" THEN 1 END) as "isRefinancedCount", count(r."RequestId")
+from "Requests" r
 
-select count(CASE WHEN ds."IsNewClient" THEN 1 END) as "newClientCount", count(ds."RequestId")
-from "DataSet" ds 
+select count(CASE WHEN r."IsRefinance" THEN 1 END) as "isRefinancedCount", count(r."RequestId")
+from "Requests" r 
 
-select count(CASE WHEN ds."IsPaidOff" THEN 1 END) as "isRefinancedCount", count(ds."RequestId")
-from "DataSet" ds
+select count(CASE WHEN r."IsRefinanced" THEN 1 END) as "isRefinancedCount", count(r."RequestId")
+from "Requests" r
 
-select count(CASE WHEN ds."IsRefinance" THEN 1 END) as "isRefinancedCount", count(ds."RequestId")
-from "DataSet" ds 
-
-select count(CASE WHEN ds."IsRefinanced" THEN 1 END) as "isRefinancedCount", count(ds."RequestId")
-from "DataSet" ds
-
-select ds."Product" , 
-date_part('month', ds."ApplicationDate") as "month",
-ds."RequestStatus" as "requestStatus",
-count(date_part('month', ds."ApplicationDate")) as "count"
-from "DataSet" ds 
-group by ds."Product", "month", "requestStatus"
-order by ds."Product", "month", "requestStatus"
-
-select ds."Product" , 
-date_part('year', ds."ApplicationDate") as "year",
-ds."RequestStatus" as "requestStatus",
-count(date_part('year', ds."ApplicationDate")) as "count"
-from "DataSet" ds 
-group by ds."Product", "year"
-order by ds."Product", "year"
 
 
 

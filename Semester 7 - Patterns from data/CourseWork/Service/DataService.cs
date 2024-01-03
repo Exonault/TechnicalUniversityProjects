@@ -17,7 +17,7 @@ public class DataService : IDataService
 
     public async Task<List<RequestStatusCountReportResponse>> RequestStatusCount()
     {
-        var result = await _dbContext.DataSet.GroupBy(x => x.RequestStatus)
+        var result = await _dbContext.Requests.GroupBy(x => x.RequestStatus)
             .Select(x => new RequestStatusCountReportResponse()
             {
                 RequestStatus = x.Key,
@@ -29,7 +29,7 @@ public class DataService : IDataService
 
     public async Task<List<ProductCountReportResponse>> ProductCount()
     {
-        var result = await _dbContext.DataSet.GroupBy(x => x.Product)
+        var result = await _dbContext.Requests.GroupBy(x => x.Product)
             .Select(x => new ProductCountReportResponse()
             {
                 Product = x.Key,
@@ -41,7 +41,7 @@ public class DataService : IDataService
 
     public async Task<List<AddressRegionCountReportResponse>> AddressRegionCount()
     {
-        var result = await _dbContext.DataSet.GroupBy(x => x.AddressRegion)
+        var result = await _dbContext.Requests.GroupBy(x => x.AddressRegion)
             .Select(x => new AddressRegionCountReportResponse()
             {
                 AddressRegion = x.Key,
@@ -53,7 +53,7 @@ public class DataService : IDataService
 
     public async Task<List<ProductAmountsReportResponse>> ProductAmounts()
     {
-        var result = await _dbContext.DataSet.GroupBy(x => x.Product)
+        var result = await _dbContext.Requests.GroupBy(x => x.Product)
             .Select(x => new ProductAmountsReportResponse()
             {
                 Product = x.Key,
@@ -67,7 +67,7 @@ public class DataService : IDataService
 
     public async Task<List<RequestStatusAmountsReportResponse>> RequestStatusAmounts()
     {
-        var result = await _dbContext.DataSet.GroupBy(x => x.RequestStatus)
+        var result = await _dbContext.Requests.GroupBy(x => x.RequestStatus)
             .Select(x => new RequestStatusAmountsReportResponse()
             {
                 RequestStatus = x.Key,
@@ -81,79 +81,82 @@ public class DataService : IDataService
 
     public decimal AverageApprovedAmount()
     {
-        return _dbContext.DataSet.Average(x => x.ApprovedAmount);
+        return _dbContext.Requests.Average(x => x.ApprovedAmount);
     }
 
     public decimal AverageLendedAmount()
     {
-        return _dbContext.DataSet.Average(x => x.LendedAmount);
+        return _dbContext.Requests.Average(x => x.LendedAmount);
     }
 
     public decimal AverageRepaidAmount()
     {
-        return _dbContext.DataSet.Average(x => x.RepaidAmount);
+        return _dbContext.Requests.Average(x => x.RepaidAmount);
     }
 
     // ReSharper disable once PossibleLossOfFraction
     public NewClientsReportResponse NewClients()
     {
-        int count = _dbContext.DataSet.Count(x => x.IsNewClient == true);
+        int count = _dbContext.Requests.Count(x => x.IsNewClient == true);
         return new NewClientsReportResponse()
         {
             NewClientsCount = count,
-            NewClientsPercentage = Decimal.Divide(count,_dbContext.DataSet.Count()) * 100.0m,
+            NewClientsPercentage = Decimal.Divide(count, _dbContext.Requests.Count()) * 100.0m,
         };
     }
 
     // ReSharper disable once PossibleLossOfFraction
     public PaidOffReportResponse PaidOff()
     {
-        int count = _dbContext.DataSet.Count(x => x.IsPaidOff == true);
+        int count = _dbContext.Requests.Count(x => x.IsPaidOff == true);
         return new PaidOffReportResponse()
         {
             PaidOffCount = count,
-            PaidOffPercentage = Decimal.Divide(count,_dbContext.DataSet.Count()) * 100.0m,
+            PaidOffPercentage = Decimal.Divide(count, _dbContext.Requests.Count()) * 100.0m,
         };
     }
 
     // ReSharper disable once PossibleLossOfFraction
     public RefinanceReportResponse Refinance()
     {
-        int count = _dbContext.DataSet.Count(x => x.IsRefinance == true);
+        int count = _dbContext.Requests.Count(x => x.IsRefinance == true);
         return new RefinanceReportResponse()
         {
             RefinanceCount = count,
-            RefinancePercentage = Decimal.Divide(count,_dbContext.DataSet.Count()) * 100.0m,
+            RefinancePercentage = Decimal.Divide(count, _dbContext.Requests.Count()) * 100.0m,
         };
     }
 
     // ReSharper disable once PossibleLossOfFraction
     public RefinancedReportResponse Refinanced()
     {
-        int count = _dbContext.DataSet.Count(x => x.IsRefinanced == true);
+        int count = _dbContext.Requests.Count(x => x.IsRefinanced == true);
         return new RefinancedReportResponse()
         {
             RefinancedCount = count,
-            RefinancedPercentage = Decimal.Divide(count,_dbContext.DataSet.Count()) * 100.0m,
+            RefinancedPercentage = Decimal.Divide(count, _dbContext.Requests.Count()) * 100.0m,
         };
     }
 
-    public async Task<List<ProductByRequestStatusMonthCountReportResponse>> ProductByRequestStatusCountMonth()
+    public async Task<List<ProductByRequestStatusYearMonthCountReportResponse>> ProductByRequestStatusCountYearMonth()
     {
-        var result = await _dbContext.DataSet.GroupBy(x => new
+        var result = await _dbContext.Requests.GroupBy(x => new
             {
                 x.Product,
                 x.RequestStatus,
+                x.ApplicationDate.Year,
                 x.ApplicationDate.Month,
             })
-            .Select(x => new ProductByRequestStatusMonthCountReportResponse()
+            .Select(x => new ProductByRequestStatusYearMonthCountReportResponse()
             {
                 Product = x.Key.Product,
                 RequestStatus = x.Key.RequestStatus,
+                Year = x.Key.Month,
                 Month = x.Key.Month,
                 Count = x.Count(),
             })
             .OrderBy(x => x.Product)
+            .ThenBy(x => x.Year)
             .ThenBy(x => x.Month)
             .ThenBy(x => x.RequestStatus)
             .ToListAsync();
@@ -163,7 +166,7 @@ public class DataService : IDataService
 
     public async Task<List<ProductByRequestStatusYearCountReportResponse>> ProductByRequestStatusCountYear()
     {
-        var result = await _dbContext.DataSet.GroupBy(x => new
+        var result = await _dbContext.Requests.GroupBy(x => new
             {
                 x.Product,
                 x.RequestStatus,
@@ -180,7 +183,26 @@ public class DataService : IDataService
             .ThenBy(x => x.Year)
             .ThenBy(x => x.RequestStatus)
             .ToListAsync();
-        
+
+        return result;
+    }
+
+    public async Task<List<ProductAddressRegionCountReportResponse>> ProductAddressRegionCountReport()
+    {
+        var result = await _dbContext.Requests.GroupBy(x => new
+            {
+                x.AddressRegion,
+                x.Product
+            }).Select(x => new ProductAddressRegionCountReportResponse()
+            {
+                AddressRegion = x.Key.AddressRegion,
+                Product = x.Key.Product,
+                Count = x.Count(),
+            })
+            .OrderBy(x => x.Product)
+            .ThenBy(x => x.AddressRegion)
+            .ToListAsync();
+
         return result;
     }
 }
