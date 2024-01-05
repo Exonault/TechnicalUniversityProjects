@@ -2,7 +2,7 @@
 
 namespace CourseWork.Interfaces;
 
-public interface IDataService
+public interface IReportService
 {
    public Task<List<RequestStatusCountReportResponse>> RequestStatusCount();
 

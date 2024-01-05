@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CourseWork.Service;
 
-public class DataService : IDataService
+public class ReportService : IReportService
 {
-    private readonly MyDbContext _dbContext;
+    private readonly RequestDbContext _dbContext;
 
-    public DataService(MyDbContext dbContext)
+    public ReportService(RequestDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -151,14 +151,14 @@ public class DataService : IDataService
             {
                 Product = x.Key.Product,
                 RequestStatus = x.Key.RequestStatus,
-                Year = x.Key.Month,
+                Year = x.Key.Year,
                 Month = x.Key.Month,
                 Count = x.Count(),
             })
             .OrderBy(x => x.Product)
+            .ThenBy(x => x.RequestStatus)
             .ThenBy(x => x.Year)
             .ThenBy(x => x.Month)
-            .ThenBy(x => x.RequestStatus)
             .ToListAsync();
 
         return result;
@@ -191,8 +191,8 @@ public class DataService : IDataService
     {
         var result = await _dbContext.Requests.GroupBy(x => new
             {
-                x.AddressRegion,
-                x.Product
+                x.Product,
+                x.AddressRegion
             }).Select(x => new ProductAddressRegionCountReportResponse()
             {
                 AddressRegion = x.Key.AddressRegion,

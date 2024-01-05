@@ -2,11 +2,11 @@
 
 namespace CourseWork.Data;
 
-public class MyDbContext:DbContext
+public class RequestDbContext:DbContext
 {
     public DbSet<Request> Requests { get; set; }
 
-    public MyDbContext(DbContextOptions options) : base(options)
+    public RequestDbContext(DbContextOptions options) : base(options)
     {
     }
     

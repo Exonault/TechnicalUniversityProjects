@@ -7,10 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDataService();
+builder.Services.AddReportService();
 
 
-builder.Services.AddDbContext<MyDbContext>(options =>
+builder.Services.AddDbContext<RequestDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDb"));
 });
@@ -23,6 +23,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapDataEndPoints();
+app.MapReportEndPoints();
 
 app.Run();

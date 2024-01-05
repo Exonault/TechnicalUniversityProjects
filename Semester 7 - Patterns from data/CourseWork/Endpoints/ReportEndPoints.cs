@@ -5,9 +5,9 @@ using CourseWork.Service;
 
 namespace CourseWork.Endpoints;
 
-public static class DataSetEndpoints
+public static class ReportEndPoints
 {
-    public static void MapDataEndPoints(this WebApplication app)
+    public static void MapReportEndPoints(this WebApplication app)
     {
         app.MapGet("/requestStatusCountReport", RequestStatusCountReport);
         app.MapGet("/productCountReport", ProductCountReport);
@@ -23,48 +23,47 @@ public static class DataSetEndpoints
         app.MapGet("/refinancedReport", RefinancedReport);
         app.MapGet("/productByRequestStatusCountYearMonthReport", ProductByRequestStatusCountYearMonthReport);
         app.MapGet("/productByRequestStatusCountYearReport", ProductByRequestStatusCountYearReport);
-        app.MapGet("/productAddressRegion", ProductByRequestStatusCountYearReport);
-        
+        app.MapGet("/productAddressRegion", ProductByAddressRegionCountReport);
     }
 
-    public static void AddDataService(this IServiceCollection services)
+    public static void AddReportService(this IServiceCollection services)
     {
-        services.AddScoped<IDataService, DataService>();
+        services.AddScoped<IReportService, ReportService>();
     }
 
-    internal static async Task<IResult> RequestStatusCountReport(IDataService service)
+    internal static async Task<IResult> RequestStatusCountReport(IReportService service)
     {
         List<RequestStatusCountReportResponse> result = await service.RequestStatusCount();
 
         return Results.Ok(result);
     }
 
-    internal static async Task<IResult> ProductCountReport(IDataService service)
+    internal static async Task<IResult> ProductCountReport(IReportService service)
     {
         List<ProductCountReportResponse> result = await service.ProductCount();
 
         return Results.Ok(result);
     }
 
-    internal static async Task<IResult> AddressRegionCountReport(IDataService service)
+    internal static async Task<IResult> AddressRegionCountReport(IReportService service)
     {
         List<AddressRegionCountReportResponse> result = await service.AddressRegionCount();
         return Results.Ok(result);
     }
 
-    internal static async Task<IResult> ProductAmountsReport(IDataService service)
+    internal static async Task<IResult> ProductAmountsReport(IReportService service)
     {
         List<ProductAmountsReportResponse> result = await service.ProductAmounts();
         return Results.Ok(result);
     }
 
-    internal static async Task<IResult> RequestStatusAmountsReport(IDataService service)
+    internal static async Task<IResult> RequestStatusAmountsReport(IReportService service)
     {
         List<RequestStatusAmountsReportResponse> result = await service.RequestStatusAmounts();
         return Results.Ok(result);
     }
 
-    internal static async Task<IResult> AverageApprovedAmountReport(IDataService service)
+    internal static IResult AverageApprovedAmountReport(IReportService service)
     {
         decimal result = service.AverageApprovedAmount();
         return Results.Ok(new
@@ -72,8 +71,8 @@ public static class DataSetEndpoints
             AverageApprovedAmount = result
         });
     }
-    
-    internal static async Task<IResult> AverageLendedAmountReport(IDataService service)
+
+    internal static IResult AverageLendedAmountReport(IReportService service)
     {
         decimal result = service.AverageLendedAmount();
         return Results.Ok(new
@@ -81,8 +80,8 @@ public static class DataSetEndpoints
             AverageLendedAmount = result
         });
     }
-    
-    internal static async Task<IResult> AverageRepaidAmountReport(IDataService service)
+
+    internal static IResult AverageRepaidAmountReport(IReportService service)
     {
         decimal result = service.AverageRepaidAmount();
         return Results.Ok(new
@@ -90,48 +89,49 @@ public static class DataSetEndpoints
             AverageRepaidAmount = result
         });
     }
-    
-    internal static async Task<IResult> NewClientsReport(IDataService service)
+
+    internal static IResult NewClientsReport(IReportService service)
     {
         NewClientsReportResponse result = service.NewClients();
 
         return Results.Ok(result);
     }
-    
-    internal static async Task<IResult> PaidOffReport(IDataService service)
+
+    internal static IResult PaidOffReport(IReportService service)
     {
         PaidOffReportResponse result = service.PaidOff();
 
         return Results.Ok(result);
     }
-    
-    internal static async Task<IResult> RefinanceReport(IDataService service)
+
+    internal static IResult RefinanceReport(IReportService service)
     {
         RefinanceReportResponse result = service.Refinance();
 
         return Results.Ok(result);
     }
-    
-    internal static async Task<IResult> RefinancedReport(IDataService service)
+
+    internal static IResult RefinancedReport(IReportService service)
     {
         RefinancedReportResponse result = service.Refinanced();
         return Results.Ok(result);
     }
-    
-    internal static async Task<IResult> ProductByRequestStatusCountYearMonthReport(IDataService service)
+
+    internal static async Task<IResult> ProductByRequestStatusCountYearMonthReport(IReportService service)
     {
-        List<ProductByRequestStatusYearMonthCountReportResponse> result = await service.ProductByRequestStatusCountYearMonth();
-        
+        List<ProductByRequestStatusYearMonthCountReportResponse> result =
+            await service.ProductByRequestStatusCountYearMonth();
+
         return Results.Ok(result);
     }
-    
-    internal static async Task<IResult> ProductByRequestStatusCountYearReport(IDataService service)
+
+    internal static async Task<IResult> ProductByRequestStatusCountYearReport(IReportService service)
     {
         List<ProductByRequestStatusYearCountReportResponse> result = await service.ProductByRequestStatusCountYear();
         return Results.Ok(result);
     }
 
-    internal static async Task<IResult> ProductByAddressRegionCountReport(IDataService service)
+    internal static async Task<IResult> ProductByAddressRegionCountReport(IReportService service)
     {
         List<ProductAddressRegionCountReportResponse> result = await service.ProductAddressRegionCountReport();
         return Results.Ok(result);
