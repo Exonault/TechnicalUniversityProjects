@@ -33,107 +33,220 @@ public static class ReportEndPoints
 
     internal static async Task<IResult> RequestStatusCountReport(IReportService service)
     {
-        List<RequestStatusCountReportResponse> result = await service.RequestStatusCount();
-
-        return Results.Ok(result);
+        try
+        {
+            List<RequestStatusCountReportResponse> result = await service.RequestStatusCount();
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static async Task<IResult> ProductCountReport(IReportService service)
     {
-        List<ProductCountReportResponse> result = await service.ProductCount();
+        try
+        {
+            List<ProductCountReportResponse> result = await service.ProductCount();
 
-        return Results.Ok(result);
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static async Task<IResult> AddressRegionCountReport(IReportService service)
     {
-        List<AddressRegionCountReportResponse> result = await service.AddressRegionCount();
-        return Results.Ok(result);
+        try
+        {
+            List<AddressRegionCountReportResponse> result = await service.AddressRegionCount();
+           
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static async Task<IResult> ProductAmountsReport(IReportService service)
     {
-        List<ProductAmountsReportResponse> result = await service.ProductAmounts();
-        return Results.Ok(result);
+        try
+        {
+            List<ProductAmountsReportResponse> result = await service.ProductAmounts();
+            
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static async Task<IResult> RequestStatusAmountsReport(IReportService service)
     {
-        List<RequestStatusAmountsReportResponse> result = await service.RequestStatusAmounts();
-        return Results.Ok(result);
+        try
+        {
+            List<RequestStatusAmountsReportResponse> result = await service.RequestStatusAmounts();
+           
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static IResult AverageApprovedAmountReport(IReportService service)
     {
-        decimal result = service.AverageApprovedAmount();
-        return Results.Ok(new
+        try
         {
-            AverageApprovedAmount = result
-        });
+            decimal result = service.AverageApprovedAmount();
+            
+            return Results.Ok(new
+            {
+                AverageApprovedAmount = result
+            });
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static IResult AverageLendedAmountReport(IReportService service)
     {
-        decimal result = service.AverageLendedAmount();
-        return Results.Ok(new
+        try
         {
-            AverageLendedAmount = result
-        });
+            decimal result = service.AverageLendedAmount();
+           
+            return Results.Ok(new
+            {
+                AverageLendedAmount = result
+            });
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static IResult AverageRepaidAmountReport(IReportService service)
     {
-        decimal result = service.AverageRepaidAmount();
-        return Results.Ok(new
+        try
         {
-            AverageRepaidAmount = result
-        });
+            decimal result = service.AverageRepaidAmount();
+           
+            return Results.Ok(new
+            {
+                AverageRepaidAmount = result
+            });
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static IResult NewClientsReport(IReportService service)
     {
-        NewClientsReportResponse result = service.NewClients();
+        try
+        {
+            NewClientsReportResponse result = service.NewClients();
 
-        return Results.Ok(result);
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static IResult PaidOffReport(IReportService service)
     {
-        PaidOffReportResponse result = service.PaidOff();
+        try
+        {
+            PaidOffReportResponse result = service.PaidOff();
 
-        return Results.Ok(result);
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static IResult RefinanceReport(IReportService service)
     {
-        RefinanceReportResponse result = service.Refinance();
+        try
+        {
+            RefinanceReportResponse result = service.Refinance();
 
-        return Results.Ok(result);
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static IResult RefinancedReport(IReportService service)
     {
-        RefinancedReportResponse result = service.Refinanced();
-        return Results.Ok(result);
+        try
+        {
+            RefinancedReportResponse result = service.Refinanced();
+            
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static async Task<IResult> ProductByRequestStatusCountYearMonthReport(IReportService service)
     {
-        List<ProductByRequestStatusYearMonthCountReportResponse> result =
-            await service.ProductByRequestStatusCountYearMonth();
+        try
+        {
+            List<ProductByRequestStatusYearMonthCountReportResponse> result =
+                await service.ProductByRequestStatusCountYearMonth();
 
-        return Results.Ok(result);
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static async Task<IResult> ProductByRequestStatusCountYearReport(IReportService service)
     {
-        List<ProductByRequestStatusYearCountReportResponse> result = await service.ProductByRequestStatusCountYear();
-        return Results.Ok(result);
+        try
+        {
+            List<ProductByRequestStatusYearCountReportResponse>
+                result = await service.ProductByRequestStatusCountYear();
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 
     internal static async Task<IResult> ProductByAddressRegionCountReport(IReportService service)
     {
-        List<ProductAddressRegionCountReportResponse> result = await service.ProductAddressRegionCountReport();
-        return Results.Ok(result);
+        try
+        {
+            List<ProductCountReportResponse> result = await service.ProductCount();
+
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.BadRequest(e.Message);
+        }
     }
 }

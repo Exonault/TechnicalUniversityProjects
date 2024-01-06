@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
 
 builder.Services.AddReportService();
 
@@ -14,6 +13,10 @@ builder.Services.AddDbContext<RequestDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("ApplicationDb"));
 });
+
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
